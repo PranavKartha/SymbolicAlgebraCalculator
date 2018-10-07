@@ -14,63 +14,11 @@ compile:
     - cse373
 
 
-testcalculator:
+test:
   stage: test
   script:
-    - gradle test -Dtest.single=TestCalculator
+    - gradle test
   tags:
     - docker
     - java
     - cse373
-
-testarraydictionary:
-  stage: test
-  script:
-    - gradle test -Dtest.single=TestArrayDictionary
-  tags:
-    - docker
-    - java
-    - cse373
-
-testdeletefunctionality:
-  stage: test
-  script:
-    - gradle test -Dtest.single=TestDeleteFunctionality
-  tags:
-    - docker
-    - java
-    - cse373
-
-
-testdeletestress:
-  stage: test
-  script:
-    - gradle test -Dtest.single=TestDeleteStress
-  tags:
-    - docker
-    - java
-    - cse373
-
-
-testdoublelinkedlist:
-  stage: test
-  script:
-    - gradle test -Dtest.single=TestDoubleLinkedList
-  tags:
-    - docker
-    - java
-    - cse373
-
-
-basetest:
-  stage: test
-  script:
-    - gradle test -Dtest.single=BaseTest
-  tags:
-    - docker
-    - java
-    - cse373
-
-
-
-
