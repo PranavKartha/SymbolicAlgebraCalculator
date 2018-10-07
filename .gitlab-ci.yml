@@ -1,7 +1,11 @@
 image: gradle:jdk8
 
+stages:
+  - compile
+  - test
+
 compile:
-  stage: test
+  stage: compile
   script:
     - gradle compileJava
   tags:
