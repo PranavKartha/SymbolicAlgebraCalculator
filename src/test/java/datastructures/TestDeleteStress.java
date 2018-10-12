@@ -107,4 +107,4 @@ public class TestDeleteStress extends TestDoubleLinkedList {
         
         assertListMatches(new String[] {"a", "b", "c"}, list);
     }
-}
+}   
