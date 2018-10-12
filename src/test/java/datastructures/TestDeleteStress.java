@@ -18,7 +18,7 @@ public class TestDeleteStress extends TestDoubleLinkedList {
     public void testExample() {
         // Feel free to modify or delete this dummy test.
         assertTrue(true);
-        assertEquals(3, 3);
+        assertEquals(3, 3); 
     }
     */
     

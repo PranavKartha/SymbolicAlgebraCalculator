@@ -12,7 +12,7 @@ import java.util.NoSuchElementException;
 public class DoubleLinkedList<T> implements IList<T> {
     // You may not rename these fields or change their types.
     // We will be inspecting these in our private tests.
-    // You also may not add any additional fields.
+    // You also may not add any additional fields. 
     private Node<T> front;
     private Node<T> back;
     private int size;

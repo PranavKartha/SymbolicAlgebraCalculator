@@ -27,7 +27,7 @@ public class TestDeleteFunctionality extends TestDoubleLinkedList {
     @Test(timeout=SECOND)
     public void testExample() {
         // Feel free to modify or delete this dummy test.
-        assertTrue(true);
+        assertTrue(true); 
         assertEquals(3, 3);
     }
     */
