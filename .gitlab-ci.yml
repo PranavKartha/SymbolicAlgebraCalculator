@@ -8,17 +8,10 @@ compile:
   stage: compile
   script:
     - gradle compileJava
-  tags:
-    - docker
-    - java
-    - cse373
 
 
 test:
   stage: test
   script:
     - gradle test
-  tags:
-    - docker
-    - java
-    - cse373
+  allow_failure: true
