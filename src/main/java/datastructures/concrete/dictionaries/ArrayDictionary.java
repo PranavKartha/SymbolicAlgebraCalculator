@@ -29,7 +29,7 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     }
 
     /**
-     * This method will return a new, empty array of the given size
+     *  This method will return a new, empty array of the given size
      * that can contain Pair<K, V> objects.
      *
      * Note that each element in the array will initially be null.

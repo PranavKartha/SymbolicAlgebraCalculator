@@ -8,7 +8,7 @@ import datastructures.concrete.DoubleLinkedList;
 import datastructures.interfaces.IList;
 
 /**
- * This file should contain any tests that check and make sure your
+ *  This file should contain any tests that check and make sure your
  * delete method is efficient.
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)

@@ -14,7 +14,7 @@ public interface IDictionary<K, V> {
     public V get(K key);
 
     /**
-     * Returns the value corresponding to the given key, if the key exists in the map.
+     *  Returns the value corresponding to the given key, if the key exists in the map.
      *
      * If the key does *not* contain the given key, returns the default value.
      *

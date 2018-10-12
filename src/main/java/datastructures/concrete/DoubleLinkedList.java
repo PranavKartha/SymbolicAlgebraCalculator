@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * Note: For more info on the expected behavior of your methods, see
+ *  Note: For more info on the expected behavior of your methods, see
  * the source code for IList.
  */
 public class DoubleLinkedList<T> implements IList<T> {
