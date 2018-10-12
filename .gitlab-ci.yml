@@ -2,7 +2,8 @@ image: gradle:jdk8
 
 stages:
   - compile
-  - test
+  - testPart1
+  - testPart2
 
 compile:
   stage: compile
@@ -10,8 +11,14 @@ compile:
     - gradle compileJava
 
 
-test:
-  stage: test
+testPart1:
+  stage: testPart1
+  script:
+    - gradle test -Dtest.profile=part1
+  allow_failure: true
+
+testPart2:
+  stage: testPart2
   script:
     - gradle test
   allow_failure: true
