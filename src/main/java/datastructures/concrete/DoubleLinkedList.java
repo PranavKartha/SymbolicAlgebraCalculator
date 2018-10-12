@@ -1,8 +1,7 @@
 package datastructures.concrete;
 
 import datastructures.interfaces.IList;
-import misc.exceptions.NotYetImplementedException;
-
+import misc.exceptions.EmptyContainerException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -26,47 +25,161 @@ public class DoubleLinkedList<T> implements IList<T> {
 
     @Override
     public void add(T item) {
-        throw new NotYetImplementedException();
+        insert(this.size, item);
     }
 
     @Override
     public T remove() {
-        throw new NotYetImplementedException();
+        if (size == 0) {
+            throw new EmptyContainerException();
+        }
+        if (size == 1) {
+            size--;
+            Node<T> removed = front;
+            front = null;
+            back = null;
+            return removed.data;
+        }else {
+            size--;
+            Node<T> removed = back;
+            back = removed.prev;
+            return removed.data;
+        }
     }
 
+    private void outOfBounds(int index) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException();
+        }     
+    }
+    
     @Override
     public T get(int index) {
-        throw new NotYetImplementedException();
+        outOfBounds(index);
+        Node<T> current = getToIndex(index);
+        return current.data; 
     }
 
     @Override
     public void set(int index, T item) {
-        throw new NotYetImplementedException();
+        outOfBounds(index);
+        if (index == 0){
+            front  = new Node<T>(null, item, front.next);
+            if (front.next != null) {
+                front.next.prev = front;
+            }
+        }else if (index == size - 1) {
+            back.prev.next = new Node<T>(back.prev, item, null);
+            back = back.prev.next;
+        }else {
+            Node<T> current = getToIndex(index);
+            Node<T> newNode = new Node<T>(current.prev, item, current.next);
+            current.prev.next = newNode;
+            current.next.prev = newNode;
+        }    
     }
 
+    private Node<T> getToIndex(int index){
+        Node<T> current = front;
+        for (int i = 0; i < index; i++) {
+            current = current.next;
+        }
+        return current;   
+    }
+    
     @Override
     public void insert(int index, T item) {
-        throw new NotYetImplementedException();
+        if (index >= this.size + 1 || index < 0) {
+            throw new IndexOutOfBoundsException();
+        }
+        
+        if (this.front == null) {
+            this.front = new Node<T>(item);
+            this.back = this.front;
+        } else if (index <= this.size / 2) {
+            Node<T> finder = this.front;
+            for (int i = 0; i < index; i++) {
+                finder = finder.next;
+            }
+            Node<T> inserto = new Node<T>(finder.prev, item, finder);
+            if (inserto.prev != null) {
+                inserto.prev.next = inserto;
+            }
+            finder.prev = inserto;
+            if (index == 0) {
+                this.front = inserto;
+            }
+        } else if (index < this.size) {
+            Node<T> finder = this.back;
+            for (int i = this.size - 1; i > index; i--) {
+                finder = finder.prev;
+            }
+            Node<T> inserto = new Node<T>(finder.prev, item, finder);
+            finder.prev.next = inserto;
+            finder.prev = inserto;
+        }    
+          else {
+            this.back.next = new Node<T>(this.back, item, null);
+            this.back = this.back.next;
+        }
+        this.size++;
     }
 
     @Override
     public T delete(int index) {
-        throw new NotYetImplementedException();
+        outOfBounds(index);
+        if (index == 0) {
+            T first = front.data;
+            front = front.next;
+            this.size--;
+            return first;
+        }else if (index == size - 1){
+            T last = back.data;
+            back = back.prev;
+            back.next = null;
+            this.size--;
+            return last;
+        }else {
+        Node<T> current = getToIndex(index);
+        current.prev.next = current.next;
+        current.next.prev = current.prev;
+        this.size--;
+        return current.data;        
+        }
     }
 
     @Override
     public int indexOf(T item) {
-        throw new NotYetImplementedException();
+        Node<T> current = front;
+        if (current != null) {
+            for (int index = 0; index < size; index++) {
+                if (current.data == item || current.data.equals(item)) {
+                    return index;
+                }else {
+                    current = current.next;
+                }
+            }
+        }
+        return -1;
     }
 
     @Override
     public int size() {
-        throw new NotYetImplementedException();
+        return this.size;
     }
 
     @Override
     public boolean contains(T other) {
-        throw new NotYetImplementedException();
+        Node<T> current = front;
+        if (current != null) {
+            for (int i = 0; i < size; i++) {
+                if (current.data == other || (current.data != null && current.data.equals(other))) {
+                    return true;
+                }
+                current = current.next;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -111,7 +224,7 @@ public class DoubleLinkedList<T> implements IList<T> {
          * returns 'false' otherwise.
          */
         public boolean hasNext() {
-            throw new NotYetImplementedException();
+            return this.current != null;
         }
 
         /**
@@ -122,7 +235,12 @@ public class DoubleLinkedList<T> implements IList<T> {
          *         there are no more elements to look at.
          */
         public T next() {
-            throw new NotYetImplementedException();
+            if (!this.hasNext()) {
+                throw new NoSuchElementException();
+            }
+            T boi = this.current.data;
+            this.current = this.current.next;
+            return boi;
         }
     }
 }
