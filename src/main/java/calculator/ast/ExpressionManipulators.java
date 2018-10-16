@@ -135,27 +135,27 @@ public class ExpressionManipulators {
 
         assertNodeMatches(node, "simplify", 1);
         AstNode exprToConvert = node.getChildren().get(0);
-        return new AstNode(handleSimplifyHelper(env.getVariables(), exprToConvert));
+        return handleSimplifyHelper(env.getVariables(), exprToConvert);
     }
     
-    private static void handleSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node){
+    private static AstNode handleSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node){
         if(node.isOperation()){
             if(node.getName().equals("simplify")) {
-                handleSimplifyHelper(variables, node.getChildren().get(0));
+                return handleSimplifyHelper(variables, node.getChildren().get(0));
             }else{
                 if(node.getChildren().get(0).isOperation()) {
-                    handleSimplifyHelper(variables, node.getChildren().get(0)); 
+                    variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(0)));
                 }
                 if(node.getChildren().get(1).isOperation()) {
-                    handleSimplifyHelper(variables, node.getChildren().get(1)); 
+                    variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(1)));
                 }
                 if(!node.getChildren().get(0).isOperation() && !node.getChildren().get(1).isOperation()){       
-                    AstNode newNode = new AstNode(toDoubleHelper(variables, node));
-                    variables.put(node.getName(), newNode);
-                    
+                    return new AstNode(toDoubleHelper(variables, node));
                 }
+                
             }    
-        }   
+        }
+        return null;   
     }
 
     /**
