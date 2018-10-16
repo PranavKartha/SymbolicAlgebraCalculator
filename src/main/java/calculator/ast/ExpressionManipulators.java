@@ -138,23 +138,24 @@ public class ExpressionManipulators {
         return new AstNode(handleSimplifyHelper(env.getVariables(), exprToConvert));
     }
     
-    private static double handleSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node){
+    private static void handleSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node){
         if(node.isOperation()){
             if(node.getName().equals("simplify")) {
-                return handleSimplifyHelper(variables, node.getChildren().get(0));
+                handleSimplifyHelper(variables, node.getChildren().get(0));
             }else{
                 if(node.getChildren().get(0).isOperation()) {
-                    return handleSimplifyHelper(variables, node.getChildren().get(0)); 
-                }else{
-                    AstNode newNode = new AstNode(node.getChildren().get(0).getNumericValue() + node.getChildren().get(1).getNumericValue());
-                    variables.put(node.getName(), newNode);
-                    return newNode.getNumericValue();
+                    handleSimplifyHelper(variables, node.getChildren().get(0)); 
                 }
-            }
-        }
-        
-        
-        
+                if(node.getChildren().get(1).isOperation()) {
+                    handleSimplifyHelper(variables, node.getChildren().get(1)); 
+                }
+                if(!node.getChildren().get(0).isOperation() && !node.getChildren().get(1).isOperation()){       
+                    AstNode newNode = new AstNode(toDoubleHelper(variables, node));
+                    variables.put(node.getName(), newNode);
+                    
+                }
+            }    
+        }   
     }
 
     /**
