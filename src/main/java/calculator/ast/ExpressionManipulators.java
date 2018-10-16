@@ -219,7 +219,7 @@ public class ExpressionManipulators {
      * 0.01
      * >>> plot(a^2 + c*a + a, a, -10, 10, step)
      *
-     * ---
+     * --- 
      *
      * @throws EvaluationError  if any of the expressions contains an undefined variable.
      * @throws EvaluationError  if varMin > varMax
