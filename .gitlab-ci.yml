@@ -1,5 +1,8 @@
 image: gradle:jdk8
 
+before_script:
+  - wget -q https://courses.cs.washington.edu/courses/cse373/18au/files/hw_scripts/hw2-build-gradle -O build.gradle
+
 stages:
   - compile
   - testPart1
@@ -8,17 +11,20 @@ stages:
 compile:
   stage: compile
   script:
-    - gradle compileJava
-
+    - wget -q https://courses.cs.washington.edu/courses/cse373/18au/files/hw_scripts/hw2p1-compile.sh
+    - sh hw2p1-compile.sh
 
 testPart1:
   stage: testPart1
   script:
-    - gradle test -Dtest.profile=part1
+    - wget -q https://courses.cs.washington.edu/courses/cse373/18au/files/hw_scripts/hw2p1.sh
+    - sh hw2p1.sh
   allow_failure: true
+
 
 testPart2:
   stage: testPart2
   script:
-    - gradle test
+    - wget -q https://courses.cs.washington.edu/courses/cse373/18au/files/hw_scripts/hw2p2.sh
+    - sh hw2p2.sh
   allow_failure: true
