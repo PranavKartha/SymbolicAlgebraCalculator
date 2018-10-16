@@ -69,20 +69,46 @@ public class ExpressionManipulators {
     private static double toDoubleHelper(IDictionary<String, AstNode> variables, AstNode node) {
         // There are three types of nodes, so we have three cases. 
         if (node.isNumber()) {
-            // TODO: your code here
-            throw new NotYetImplementedException();
+            return node.getNumericValue();
         } else if (node.isVariable()) {
-            // TODO: your code here
-            throw new NotYetImplementedException();
+            AstNode newNode = variables.get(node.getName());
+            return toDoubleHelper(variables, newNode);
         } else {
             // You may assume the expression node has the correct number of children.
             // If you wish to make your code more robust, you can also use the provided
             // "assertNodeMatches" method to verify the input is valid.
-            String name = node.getName();
-
-            // TODO: your code here
-            throw new NotYetImplementedException();
+            return checkToDoubleOperations(node, variables);
         }
+    }
+    
+    // Applies the effects of the inputed operation and returns a double value based
+    // on the inputed AstNode and IDictionary<String, AstNode> references
+    private static double checkToDoubleOperations(AstNode node, IDictionary<String, AstNode> variables) {
+        String name = node.getName();
+        
+        if (name.equals("+")) {
+            return toDoubleHelper(variables, node.getChildren().get(0)) 
+                    + toDoubleHelper(variables, node.getChildren().get(1));
+        } else if (name.equals("-")) {
+            return toDoubleHelper(variables, node.getChildren().get(0)) 
+                    - toDoubleHelper(variables, node.getChildren().get(1));
+        } else if (name.equals("*")) {
+            return toDoubleHelper(variables, node.getChildren().get(0)) 
+                    * toDoubleHelper(variables, node.getChildren().get(1));
+        } else if (name.equals("/")) {
+            return toDoubleHelper(variables, node.getChildren().get(0)) 
+                    / toDoubleHelper(variables, node.getChildren().get(1));
+        } else if (name.equals("^")) {
+            return Math.pow(toDoubleHelper(variables, node.getChildren().get(0)),
+                    toDoubleHelper(variables, node.getChildren().get(1)));
+        } else if (name.equals("negate")) {
+            return -1.0 * toDoubleHelper(variables, node.getChildren().get(0));
+        } else if (name.equals("sin")) {
+            return Math.sin(toDoubleHelper(variables, node.getChildren().get(0)));
+        } else if (name.equals("cos")) {
+            return Math.cos(toDoubleHelper(variables, node.getChildren().get(0)));
+        }
+        return 0.0;
     }
 
     /**
@@ -120,8 +146,49 @@ public class ExpressionManipulators {
 
         assertNodeMatches(node, "simplify", 1);
 
-        // TODO: Your code here
-        throw new NotYetImplementedException();
+        AstNode exprToConvert = node.getChildren().get(0);
+        return new AstNode(simplifyHelper(env.getVariables(), exprToConvert));
+    }
+    
+    //
+    private static double simplifyHelper(IDictionary<String, AstNode> variables, AstNode node) {
+        if (node.isNumber()) {
+            return node.getNumericValue();
+        } else if (node.isVariable()) {
+            AstNode newNode = variables.get(node.getName());
+            return simplifyHelper(variables, newNode);
+        } else if (node.isOperation()) {
+            return checkSimplifyOperations(variables, node);
+        }
+        return 0.0;
+    }
+    
+    //
+    private static double checkSimplifyOperations(IDictionary<String, AstNode> variables, AstNode node) {
+        String name = node.getName();
+        if (name.equals("+")) {
+            return simplifyHelper(variables, node.getChildren().get(0)) +
+                    simplifyHelper(variables, node.getChildren().get(1));
+        } else if (name.equals("-")) {
+            return simplifyHelper(variables, node.getChildren().get(0)) -
+                    simplifyHelper(variables, node.getChildren().get(1));
+        } else if (name.equals("*")) {
+            return simplifyHelper(variables, node.getChildren().get(0)) *
+                    simplifyHelper(variables, node.getChildren().get(1));
+        } else if (name.equals("/")) {
+            return simplifyHelper(variables, node.getChildren().get(0)) /
+                    simplifyHelper(variables, node.getChildren().get(1));
+        } else if (name.equals("^")) {
+            return Math.pow(simplifyHelper(variables, node.getChildren().get(0)),
+                    simplifyHelper(variables, node.getChildren().get(1)));
+        } else if (name.equals("negate")) {
+            return -1.0 * simplifyHelper(variables, node.getChildren().get(0));
+        } else if (name.equals("sin")) {
+            return Math.sin(simplifyHelper(variables, node.getChildren().get(0)));
+        } else if (name.equals("cos")) {
+            return Math.cos(simplifyHelper(variables, node.getChildren().get(0)));
+        }
+        return 0.0;
     }
 
     /**
