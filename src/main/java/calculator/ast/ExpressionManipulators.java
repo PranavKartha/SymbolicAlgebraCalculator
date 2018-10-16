@@ -69,19 +69,34 @@ public class ExpressionManipulators {
     private static double toDoubleHelper(IDictionary<String, AstNode> variables, AstNode node) {
         // There are three types of nodes, so we have three cases. 
         if (node.isNumber()) {
-            // TODO: your code here
-            throw new NotYetImplementedException();
+            return node.getNumericValue();
         } else if (node.isVariable()) {
-            // TODO: your code here
-            throw new NotYetImplementedException();
+            String variable = node.getName();
+            return toDoubleHelper(variables, variables.get(variable));            
         } else {
             // You may assume the expression node has the correct number of children.
             // If you wish to make your code more robust, you can also use the provided
             // "assertNodeMatches" method to verify the input is valid.
             String name = node.getName();
-
-            // TODO: your code here
-            throw new NotYetImplementedException();
+            if(name.equals("+")) {
+                return toDoubleHelper(variables, node.getChildren().get(0)) + toDoubleHelper(variables, node.getChildren().get(0));
+            }else if(name.equals("-")) {
+                return toDoubleHelper(variables, node.getChildren().get(0)) - toDoubleHelper(variables, node.getChildren().get(0));
+            }else if(name.equals("*")) {
+                return toDoubleHelper(variables, node.getChildren().get(0)) * toDoubleHelper(variables, node.getChildren().get(0));
+            }else if(name.equals("/")) {
+                return toDoubleHelper(variables, node.getChildren().get(0)) / toDoubleHelper(variables, node.getChildren().get(0));
+            }else if(name.equals("^")) {
+                return Math.pow(toDoubleHelper(variables, node.getChildren().get(0)), toDoubleHelper(variables, node.getChildren().get(1))) ;
+            }else if(name.equals("negate")) {
+                return -1 * toDoubleHelper(variables, node.getChildren().get(0)) ;
+            }else if(name.equals("sin")) {
+                return Math.sin(toDoubleHelper(variables, node.getChildren().get(0)));
+            }else if(name.equals("cos")) {
+                return Math.cos(toDoubleHelper(variables, node.getChildren().get(0)));
+            }else{
+                return 0;
+            }
         }
     }
 
@@ -119,9 +134,27 @@ public class ExpressionManipulators {
         //         the current level? Or before?
 
         assertNodeMatches(node, "simplify", 1);
-
-        // TODO: Your code here
-        throw new NotYetImplementedException();
+        AstNode exprToConvert = node.getChildren().get(0);
+        return new AstNode(handleSimplifyHelper(env.getVariables(), exprToConvert));
+    }
+    
+    private static double handleSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node){
+        if(node.isOperation()){
+            if(node.getName().equals("simplify")) {
+                return handleSimplifyHelper(variables, node.getChildren().get(0));
+            }else{
+                if(node.getChildren().get(0).isOperation()) {
+                    return handleSimplifyHelper(variables, node.getChildren().get(0)); 
+                }else{
+                    AstNode newNode = new AstNode(node.getChildren().get(0).getNumericValue() + node.getChildren().get(1).getNumericValue());
+                    variables.put(node.getName(), newNode);
+                    return newNode.getNumericValue();
+                }
+            }
+        }
+        
+        
+        
     }
 
     /**
