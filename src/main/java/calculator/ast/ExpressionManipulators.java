@@ -1,8 +1,14 @@
 package calculator.ast;
 
 import calculator.interpreter.Environment;
+
+import java.util.Iterator;
+import java.awt.*;
 import calculator.errors.EvaluationError;
+import calculator.gui.ImageDrawer;
+import datastructures.concrete.DoubleLinkedList;
 import datastructures.interfaces.IDictionary;
+import datastructures.interfaces.IList;
 import misc.exceptions.NotYetImplementedException;
 
 /**
@@ -139,24 +145,19 @@ public class ExpressionManipulators {
     }
     
     private static AstNode handleSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node){
-        if(node.isOperation()){
-            if(node.getName().equals("simplify")) {
-                return handleSimplifyHelper(variables, node.getChildren().get(0));
-            }else{
-                if(node.getChildren().get(0).isOperation()) {
-                    variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(0)));
-                }
-                if(node.getChildren().get(1).isOperation()) {
-                    variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(1)));
-                }
-                if(!node.getChildren().get(0).isOperation() && !node.getChildren().get(1).isOperation()){       
-                    return new AstNode(toDoubleHelper(variables, node));
-                }
-                
-            }    
+        if(node.getChildren().get(0).isOperation()) {
+            variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(0)));
         }
-        return null;   
-    }
+        if(node.getChildren().get(1).isOperation()) {
+            variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(1)));
+        }
+        if(!node.getChildren().get(0).isOperation() && !node.getChildren().get(1).isOperation()){       
+            return new AstNode(toDoubleHelper(variables, node));
+        }
+        return node;               
+     }    
+        
+    
 
     /**
      * Accepts an Environment variable and a 'plot(exprToPlot, var, varMin, varMax, step)'
@@ -195,9 +196,30 @@ public class ExpressionManipulators {
      */
     public static AstNode plot(Environment env, AstNode node) {
         assertNodeMatches(node, "plot", 5);
-
+        AstNode exprToPlot = node.getChildren().get(0);
+        AstNode var = node.getChildren().get(1);
+        AstNode varMin = node.getChildren().get(2);
+        AstNode varMax = node.getChildren().get(3);
+        AstNode step = node.getChildren().get(4);
+        DoubleLinkedList<Double> xValues = new DoubleLinkedList<Double>();
+        DoubleLinkedList<Double> yValues = new DoubleLinkedList<Double>();
+        for(double i = varMin.getNumericValue(); i < varMax.getNumericValue(); i += step.getNumericValue()) {
+            xValues.add(i);
+        }
+        Iterator<Double> iterator = xValues.iterator();
+        while(iterator.hasNext()) {
+            yValues.add(handlePlot(env.getVariables(), exprToPlot, iterator.next(), var.getName()));            
+        }
+        ImageDrawer drawer = env.getImageDrawer();
+        drawer.drawScatterPlot("title", "xAxisLabel", "yAxisLabel", xValues, yValues);
+         return new AstNode(1);
+    }
         // TODO: Your code here
-        throw new NotYetImplementedException();
+
+    private static Double handlePlot(IDictionary<String, AstNode> variables, AstNode exprToPlot, double next, String name) {
+        variables.put(name, new AstNode(next));
+        return handleSimplifyHelper(variables, exprToPlot).getNumericValue();
+    }
 
         // Note: every single function we add MUST return an
         // AST node that your "simplify" function is capable of handling.
@@ -208,6 +230,5 @@ public class ExpressionManipulators {
         //
         // When working on this method, you should uncomment the following line:
         //
-        // return new AstNode(1);
-    }
+    
 }
