@@ -160,26 +160,21 @@ public class ExpressionManipulators {
     private static AstNode handleSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node){
         if(node.isOperation()){
             if(node.getChildren().get(0).isOperation()) {
-                variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(0)));
+                node.getChildren().set(0, handleSimplifyHelper(variables, node.getChildren().get(0)));
             }
+            
             if(node.getChildren().get(1).isOperation()) {
-                variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(1)));
+                node.getChildren().set(1, handleSimplifyHelper(variables, node.getChildren().get(1)));
             }
-            if(!node.getChildren().get(0).isOperation() && !node.getChildren().get(1).isOperation()){       
-                return new AstNode(toDoubleHelper(variables, node));
-            }
-        if(node.getChildren().get(0).isOperation()) {
-            variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(0)));
         }
-        return node;   
-    }
-        if(node.getChildren().get(1).isOperation()) {
+        /*if(node.getChildren().get(1).isOperation()) {
             variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(1)));
         }
         if(!node.getChildren().get(0).isOperation() && !node.getChildren().get(1).isOperation()){       
             return new AstNode(toDoubleHelper(variables, node));
-        }
-        return node;               
+        }*/
+        
+        return new AstNode(toDoubleHelper(variables, node));             
      }    
         
     
@@ -228,7 +223,7 @@ public class ExpressionManipulators {
         AstNode varMax = node.getChildren().get(3);
         AstNode step = node.getChildren().get(4);
         
-        if (/* || any of the expression vars is undefined*/allVarsExist(node, env.getVariables())) {
+        if (allVarsExist(node, env.getVariables())) {
             throw new EvaluationError("undefined expression!");
         }
         if (varMin.getNumericValue() > varMax.getNumericValue()) {
@@ -269,7 +264,7 @@ public class ExpressionManipulators {
     //
     private static boolean allVarsExist(AstNode node, IDictionary<String, AstNode> variables) {
         boolean varsExist = false;
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < node.getChildren().size(); i++) {
             varsExist = checkVars(node.getChildren().get(i), variables);
         }
         
