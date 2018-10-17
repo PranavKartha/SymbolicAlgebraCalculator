@@ -168,13 +168,6 @@ public class ExpressionManipulators {
                 node.getChildren().set(1, handleSimplifyHelper(variables, node.getChildren().get(1)));
             }
         }
-        /*if(node.getChildren().get(1).isOperation()) { 
-            variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(1)));
-        }
-        if(!node.getChildren().get(0).isOperation() && !node.getChildren().get(1).isOperation()){       
-            return new AstNode(toDoubleHelper(variables, node));
-        }*/
-        
         return new AstNode(toDoubleHelper(variables, node));             
      }    
         
