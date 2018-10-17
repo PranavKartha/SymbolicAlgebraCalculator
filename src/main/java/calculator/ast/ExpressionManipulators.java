@@ -167,13 +167,18 @@ public class ExpressionManipulators {
                 node.getChildren().set(0, handleSimplifyHelper(variables, node.getChildren().get(0)));
             }
             
-            if( node.getChildren().get(1).isOperation()) {
+            if(node.getChildren().size() == 2 && node.getChildren().get(1).isOperation()) {
                 node.getChildren().set(1, handleSimplifyHelper(variables, node.getChildren().get(1)));
             }
             AstNode kid1 = node.getChildren().get(0);
-            AstNode kid2 = node.getChildren().get(1);
+            AstNode kid2 = null;
+            
+            if (node.getChildren().size() == 2) {
+                
+            kid2 = node.getChildren().get(1);
+            }
             if ((kid1.isVariable() && !variables.containsKey(kid1.getName())) || 
-                    (kid2.isVariable() && !variables.containsKey(kid2.getName()))){
+                    (kid2 != null && (kid2.isVariable() && !variables.containsKey(kid2.getName())))){
                 return node;
             }
         }
@@ -226,7 +231,7 @@ public class ExpressionManipulators {
         AstNode varMax = node.getChildren().get(3);
         AstNode step = node.getChildren().get(4);
         
-        if (allVarsExist(node, env.getVariables())) {
+        if (!allVarsExist(node, env.getVariables())) {
             throw new EvaluationError("undefined expression!");
         }
         if (varMin.getNumericValue() > varMax.getNumericValue()) {
@@ -242,7 +247,7 @@ public class ExpressionManipulators {
         IList<Double> xValues = new DoubleLinkedList<Double>();
         IList<Double> yValues = new DoubleLinkedList<Double>();
         
-        for(double i = varMin.getNumericValue(); i < varMax.getNumericValue(); i += step.getNumericValue()) {
+        for(double i = varMin.getNumericValue(); i <= varMax.getNumericValue(); i += step.getNumericValue()) {
             xValues.add(i);
         }
         
