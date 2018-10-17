@@ -1,11 +1,14 @@
 package calculator.ast;
 
 import calculator.interpreter.Environment;
+
+import java.util.Iterator;
+import java.awt.*;
 import calculator.errors.EvaluationError;
 import calculator.gui.ImageDrawer;
 import datastructures.concrete.DoubleLinkedList;
 import datastructures.interfaces.IDictionary;
-import misc.exceptions.NotYetImplementedException;
+import datastructures.interfaces.IList;
 
 /**
  * All of the public static methods in this class are given the exact same parameters for
@@ -165,10 +168,21 @@ public class ExpressionManipulators {
             if(!node.getChildren().get(0).isOperation() && !node.getChildren().get(1).isOperation()){       
                 return new AstNode(toDoubleHelper(variables, node));
             }
+        if(node.getChildren().get(0).isOperation()) {
+            variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(0)));
         }
         return node;   
     }
-
+        if(node.getChildren().get(1).isOperation()) {
+            variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(1)));
+        }
+        if(!node.getChildren().get(0).isOperation() && !node.getChildren().get(1).isOperation()){       
+            return new AstNode(toDoubleHelper(variables, node));
+        }
+        return node;               
+     }    
+        
+    
     /**
      * Accepts an Environment variable and a 'plot(exprToPlot, var, varMin, varMax, step)'
      * AstNode and generates the corresponding plot on the ImageDrawer attached to the
@@ -206,22 +220,76 @@ public class ExpressionManipulators {
      */
     public static AstNode plot(Environment env, AstNode node) {
         
-        
         assertNodeMatches(node, "plot", 5);
 
-        AstNode newNode = node.getChildren().get(0);
-        AstNode exprToPlot = newNode.getChildren().get(0);
-        AstNode var = newNode.getChildren().get(1);
-        AstNode varMin = newNode.getChildren().get(2);
-        AstNode varMax = newNode.getChildren().get(3);
-        AstNode step = newNode.getChildren().get(4);
+        AstNode exprToPlot = node.getChildren().get(0);
+        AstNode var = node.getChildren().get(1);
+        AstNode varMin = node.getChildren().get(2);
+        AstNode varMax = node.getChildren().get(3);
+        AstNode step = node.getChildren().get(4);
         
-        IList<Double> xVars = new DoubleLinkedList<>();
-        IList<Double> yVars = new DoubleLinkedList<>();
+        if (/* || any of the expression vars is undefined*/allVarsExist(node, env.getVariables())) {
+            throw new EvaluationError("undefined expression!");
+        }
+        if (varMin.getNumericValue() > varMax.getNumericValue()) {
+            throw new EvaluationError("varMin > varMax!");
+        }
+        if (step.getNumericValue() <= 0) {
+            throw new EvaluationError("step is less than/equal to 0!");
+        }
+        if (env.getVariables().containsKey(var.getName())) {
+            throw new EvaluationError("Variable " + var.getName() + " already exists!");
+        }
         
+        IList<Double> xValues = new DoubleLinkedList<Double>();
+        IList<Double> yValues = new DoubleLinkedList<Double>();
         
-        ImageDrawer i = new ImageDrawer();
-        i.drawScatterPlot(, xAxisLabel, yAxisLabel, xValues, yValues);
+        for(double i = varMin.getNumericValue(); i < varMax.getNumericValue(); i += step.getNumericValue()) {
+            xValues.add(i);
+        }
+        
+        Iterator<Double> iterator = xValues.iterator();
+        while(iterator.hasNext()) {
+            yValues.add(handlePlot(env.getVariables(), exprToPlot, iterator.next(), var.getName()));            
+        }
+        
+        env.getVariables().remove(var.getName());
+        
+        ImageDrawer drawer = env.getImageDrawer();
+        drawer.drawScatterPlot("title", "xAxisLabel", "yAxisLabel", xValues, yValues);
+        return new AstNode(1);
+    }
+
+    //
+    private static Double handlePlot(IDictionary<String, AstNode> variables, AstNode exprToPlot, double next, String name) {
+        variables.put(name, new AstNode(next));
+        return handleSimplifyHelper(variables, exprToPlot).getNumericValue();
+    }
+    
+    //
+    private static boolean allVarsExist(AstNode node, IDictionary<String, AstNode> variables) {
+        boolean varsExist = false;
+        for (int i = 0; i < 5; i++) {
+            varsExist = checkVars(node.getChildren().get(i), variables);
+        }
+        
+        return varsExist;
+    }
+    
+    private static boolean checkVars(AstNode node, IDictionary<String, AstNode> variables) {
+        if (node.isNumber()) {
+            return true;
+        } else if (node.isVariable()) {
+            return variables.containsKey(node.getName());
+        } else {
+            if (node.getChildren().size() == 1) {
+                return checkVars(node.getChildren().get(0), variables);
+            } else {
+                return checkVars(node.getChildren().get(0), variables) && checkVars(node.getChildren().get(1), variables);
+            }
+        }
+    }
+
         // Note: every single function we add MUST return an
         // AST node that your "simplify" function is capable of handling.
         // However, your "simplify" function doesn't really know what to do
@@ -232,10 +300,4 @@ public class ExpressionManipulators {
         // When working on this method, you should uncomment the following line:
         //
         // return new AstNode(1);
-    }
-    
-    //
-    private static AstNode handlePlot(AstNode node, IDictionary<String, AstNode> variables){
-        
-    }
 }
