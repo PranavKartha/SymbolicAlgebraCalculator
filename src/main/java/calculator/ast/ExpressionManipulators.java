@@ -170,7 +170,6 @@ public class ExpressionManipulators {
             if( node.getChildren().get(1).isOperation()) {
                 node.getChildren().set(1, handleSimplifyHelper(variables, node.getChildren().get(1)));
             }
-            
             AstNode kid1 = node.getChildren().get(0);
             AstNode kid2 = node.getChildren().get(1);
             if ((kid1.isVariable() && !variables.containsKey(kid1.getName())) || 
