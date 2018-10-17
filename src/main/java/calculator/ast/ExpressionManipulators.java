@@ -169,10 +169,7 @@ public class ExpressionManipulators {
             if(!node.getChildren().get(0).isOperation() && !node.getChildren().get(1).isOperation()){       
                 return new AstNode(toDoubleHelper(variables, node));
             }
-        if(node.getChildren().get(0).isOperation()) {
-            variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(0)));
-        }
-        return node;   
+            return node;   
     }
         if(node.getChildren().get(1).isOperation()) {
             variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(1)));
