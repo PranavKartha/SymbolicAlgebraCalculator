@@ -77,7 +77,10 @@ public class ExpressionManipulators {
             return node.getNumericValue();
         } else if (node.isVariable()) {         
             String variable = node.getName();
-            return toDoubleHelper(variables, variables.get(variable));
+            if (variables.containsKey(variable)) {
+                return toDoubleHelper(variables, variables.get(variable));
+            }
+            return 0;
             //fix this
         } else {
             return checkToDoubleOperations(node, variables);
@@ -159,13 +162,20 @@ public class ExpressionManipulators {
     }
     
     private static AstNode handleSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node){
-        if(node.isOperation()){
-            if(node.getChildren().get(0).isOperation()) {
+        if (node.isOperation()){
+            if (node.getChildren().get(0).isOperation()) {
                 node.getChildren().set(0, handleSimplifyHelper(variables, node.getChildren().get(0)));
             }
             
-            if(node.getChildren().get(1).isOperation()) {
+            if( node.getChildren().get(1).isOperation()) {
                 node.getChildren().set(1, handleSimplifyHelper(variables, node.getChildren().get(1)));
+            }
+            
+            AstNode kid1 = node.getChildren().get(0);
+            AstNode kid2 = node.getChildren().get(1);
+            if ((kid1.isVariable() && !variables.containsKey(kid1.getName())) || 
+                    (kid2.isVariable() && !variables.containsKey(kid2.getName()))){
+                return node;
             }
         }
         return new AstNode(toDoubleHelper(variables, node));             
