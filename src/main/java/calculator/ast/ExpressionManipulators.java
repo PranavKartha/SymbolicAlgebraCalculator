@@ -9,7 +9,6 @@ import calculator.gui.ImageDrawer;
 import datastructures.concrete.DoubleLinkedList;
 import datastructures.interfaces.IDictionary;
 import datastructures.interfaces.IList;
-import misc.exceptions.NotYetImplementedException;
 
 /**
  * All of the public static methods in this class are given the exact same parameters for
@@ -76,34 +75,48 @@ public class ExpressionManipulators {
         // There are three types of nodes, so we have three cases. 
         if (node.isNumber()) {
             return node.getNumericValue();
-        } else if (node.isVariable()) {
+        } else if (node.isVariable()) {         
             String variable = node.getName();
-            return toDoubleHelper(variables, variables.get(variable));            
+            return toDoubleHelper(variables, variables.get(variable));
+            //fix this
         } else {
+            return checkToDoubleOperations(node, variables);
             // You may assume the expression node has the correct number of children.
             // If you wish to make your code more robust, you can also use the provided
             // "assertNodeMatches" method to verify the input is valid.
-            String name = node.getName();
-            if(name.equals("+")) {
-                return toDoubleHelper(variables, node.getChildren().get(0)) + toDoubleHelper(variables, node.getChildren().get(1));
-            }else if(name.equals("-")) {
-                return toDoubleHelper(variables, node.getChildren().get(0)) - toDoubleHelper(variables, node.getChildren().get(1));
-            }else if(name.equals("*")) {
-                return toDoubleHelper(variables, node.getChildren().get(0)) * toDoubleHelper(variables, node.getChildren().get(1));
-            }else if(name.equals("/")) {
-                return toDoubleHelper(variables, node.getChildren().get(0)) / toDoubleHelper(variables, node.getChildren().get(1));
-            }else if(name.equals("^")) {
-                return Math.pow(toDoubleHelper(variables, node.getChildren().get(0)), toDoubleHelper(variables, node.getChildren().get(1))) ;
-            }else if(name.equals("negate")) {
-                return -1 * toDoubleHelper(variables, node.getChildren().get(0)) ;
-            }else if(name.equals("sin")) {
-                return Math.sin(toDoubleHelper(variables, node.getChildren().get(0)));
-            }else if(name.equals("cos")) {
-                return Math.cos(toDoubleHelper(variables, node.getChildren().get(0)));
-            }else{
-                return 0;
-            }
+
         }
+    }
+
+    
+    // Applies the effects of the inputed operation and returns a double value based
+    // on the inputed AstNode and IDictionary<String, AstNode> references
+    private static double checkToDoubleOperations(AstNode node, IDictionary<String, AstNode> variables) {
+        String name = node.getName();
+        
+        if (name.equals("+")) {
+            return toDoubleHelper(variables, node.getChildren().get(0)) 
+                    + toDoubleHelper(variables, node.getChildren().get(1));
+        } else if (name.equals("-")) {
+            return toDoubleHelper(variables, node.getChildren().get(0)) 
+                    - toDoubleHelper(variables, node.getChildren().get(1));
+        } else if (name.equals("*")) {
+            return toDoubleHelper(variables, node.getChildren().get(0)) 
+                    * toDoubleHelper(variables, node.getChildren().get(1));
+        } else if (name.equals("/")) {
+            return toDoubleHelper(variables, node.getChildren().get(0)) 
+                    / toDoubleHelper(variables, node.getChildren().get(1));
+        } else if (name.equals("^")) {
+            return Math.pow(toDoubleHelper(variables, node.getChildren().get(0)),
+                    toDoubleHelper(variables, node.getChildren().get(1)));
+        } else if (name.equals("negate")) {
+            return -1.0 * toDoubleHelper(variables, node.getChildren().get(0));
+        } else if (name.equals("sin")) {
+            return Math.sin(toDoubleHelper(variables, node.getChildren().get(0)));
+        } else if (name.equals("cos")) {
+            return Math.cos(toDoubleHelper(variables, node.getChildren().get(0)));
+        }
+        return 0.0;
     }
 
     /**
@@ -140,14 +153,27 @@ public class ExpressionManipulators {
         //         the current level? Or before?
 
         assertNodeMatches(node, "simplify", 1);
+
         AstNode exprToConvert = node.getChildren().get(0);
         return handleSimplifyHelper(env.getVariables(), exprToConvert);
     }
     
     private static AstNode handleSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node){
+        if(node.isOperation()){
+            if(node.getChildren().get(0).isOperation()) {
+                variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(0)));
+            }
+            if(node.getChildren().get(1).isOperation()) {
+                variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(1)));
+            }
+            if(!node.getChildren().get(0).isOperation() && !node.getChildren().get(1).isOperation()){       
+                return new AstNode(toDoubleHelper(variables, node));
+            }
         if(node.getChildren().get(0).isOperation()) {
             variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(0)));
         }
+        return node;   
+    }
         if(node.getChildren().get(1).isOperation()) {
             variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(1)));
         }
@@ -158,7 +184,6 @@ public class ExpressionManipulators {
      }    
         
     
-
     /**
      * Accepts an Environment variable and a 'plot(exprToPlot, var, varMin, varMax, step)'
      * AstNode and generates the corresponding plot on the ImageDrawer attached to the
@@ -187,7 +212,7 @@ public class ExpressionManipulators {
      * 0.01
      * >>> plot(a^2 + c*a + a, a, -10, 10, step)
      *
-     * ---
+     * --- 
      *
      * @throws EvaluationError  if any of the expressions contains an undefined variable.
      * @throws EvaluationError  if varMin > varMax
@@ -195,30 +220,75 @@ public class ExpressionManipulators {
      * @throws EvaluationError  if 'step' is zero or negative
      */
     public static AstNode plot(Environment env, AstNode node) {
+        
         assertNodeMatches(node, "plot", 5);
+
         AstNode exprToPlot = node.getChildren().get(0);
         AstNode var = node.getChildren().get(1);
         AstNode varMin = node.getChildren().get(2);
         AstNode varMax = node.getChildren().get(3);
         AstNode step = node.getChildren().get(4);
-        DoubleLinkedList<Double> xValues = new DoubleLinkedList<Double>();
-        DoubleLinkedList<Double> yValues = new DoubleLinkedList<Double>();
+        
+        if (/* || any of the expression vars is undefined*/allVarsExist(node, env.getVariables())) {
+            throw new EvaluationError("undefined expression!");
+        }
+        if (varMin.getNumericValue() > varMax.getNumericValue()) {
+            throw new EvaluationError("varMin > varMax!");
+        }
+        if (step.getNumericValue() <= 0) {
+            throw new EvaluationError("step is less than/equal to 0!");
+        }
+        if (env.getVariables().containsKey(var.getName())) {
+            throw new EvaluationError("Variable " + var.getName() + " already exists!");
+        }
+        
+        IList<Double> xValues = new DoubleLinkedList<Double>();
+        IList<Double> yValues = new DoubleLinkedList<Double>();
+        
         for(double i = varMin.getNumericValue(); i < varMax.getNumericValue(); i += step.getNumericValue()) {
             xValues.add(i);
         }
+        
         Iterator<Double> iterator = xValues.iterator();
         while(iterator.hasNext()) {
             yValues.add(handlePlot(env.getVariables(), exprToPlot, iterator.next(), var.getName()));            
         }
+        
+        env.getVariables().remove(var.getName());
+        
         ImageDrawer drawer = env.getImageDrawer();
         drawer.drawScatterPlot("title", "xAxisLabel", "yAxisLabel", xValues, yValues);
-         return new AstNode(1);
+        return new AstNode(1);
     }
-        // TODO: Your code here
 
+    //
     private static Double handlePlot(IDictionary<String, AstNode> variables, AstNode exprToPlot, double next, String name) {
         variables.put(name, new AstNode(next));
         return handleSimplifyHelper(variables, exprToPlot).getNumericValue();
+    }
+    
+    //
+    private static boolean allVarsExist(AstNode node, IDictionary<String, AstNode> variables) {
+        boolean varsExist = false;
+        for (int i = 0; i < 5; i++) {
+            varsExist = checkVars(node.getChildren().get(i), variables);
+        }
+        
+        return varsExist;
+    }
+    
+    private static boolean checkVars(AstNode node, IDictionary<String, AstNode> variables) {
+        if (node.isNumber()) {
+            return true;
+        } else if (node.isVariable()) {
+            return variables.containsKey(node.getName());
+        } else {
+            if (node.getChildren().size() == 1) {
+                return checkVars(node.getChildren().get(0), variables);
+            } else {
+                return checkVars(node.getChildren().get(0), variables) && checkVars(node.getChildren().get(1), variables);
+            }
+        }
     }
 
         // Note: every single function we add MUST return an
@@ -230,5 +300,5 @@ public class ExpressionManipulators {
         //
         // When working on this method, you should uncomment the following line:
         //
-    
+        // return new AstNode(1);
 }
