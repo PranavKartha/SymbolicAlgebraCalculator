@@ -85,13 +85,13 @@ public class ExpressionManipulators {
             // "assertNodeMatches" method to verify the input is valid.
             String name = node.getName();
             if(name.equals("+")) {
-                return toDoubleHelper(variables, node.getChildren().get(0)) + toDoubleHelper(variables, node.getChildren().get(0));
+                return toDoubleHelper(variables, node.getChildren().get(0)) + toDoubleHelper(variables, node.getChildren().get(1));
             }else if(name.equals("-")) {
-                return toDoubleHelper(variables, node.getChildren().get(0)) - toDoubleHelper(variables, node.getChildren().get(0));
+                return toDoubleHelper(variables, node.getChildren().get(0)) - toDoubleHelper(variables, node.getChildren().get(1));
             }else if(name.equals("*")) {
-                return toDoubleHelper(variables, node.getChildren().get(0)) * toDoubleHelper(variables, node.getChildren().get(0));
+                return toDoubleHelper(variables, node.getChildren().get(0)) * toDoubleHelper(variables, node.getChildren().get(1));
             }else if(name.equals("/")) {
-                return toDoubleHelper(variables, node.getChildren().get(0)) / toDoubleHelper(variables, node.getChildren().get(0));
+                return toDoubleHelper(variables, node.getChildren().get(0)) / toDoubleHelper(variables, node.getChildren().get(1));
             }else if(name.equals("^")) {
                 return Math.pow(toDoubleHelper(variables, node.getChildren().get(0)), toDoubleHelper(variables, node.getChildren().get(1))) ;
             }else if(name.equals("negate")) {
