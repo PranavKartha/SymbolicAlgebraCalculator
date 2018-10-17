@@ -2,17 +2,18 @@ package datastructures.concrete;
 
 import datastructures.interfaces.IList;
 import misc.exceptions.EmptyContainerException;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * Note: For more info on the expected behavior of your methods, see
+ *  Note: For more info on the expected behavior of your methods, see
  * the source code for IList.
  */
 public class DoubleLinkedList<T> implements IList<T> {
     // You may not rename these fields or change their types.
     // We will be inspecting these in our private tests.
-    // You also may not add any additional fields. 
+    // You also may not add any additional fields.
     private Node<T> front;
     private Node<T> back;
     private int size;
@@ -39,7 +40,7 @@ public class DoubleLinkedList<T> implements IList<T> {
             front = null;
             back = null;
             return removed.data;
-        }else {
+        } else {
             size--;
             Node<T> removed = back;
             back = removed.prev;
@@ -63,7 +64,7 @@ public class DoubleLinkedList<T> implements IList<T> {
     @Override
     public void set(int index, T item) {
         outOfBounds(index);
-        if (index == 0){
+        if (index == 0) {
             front  = new Node<T>(null, item, front.next);
             if (front.next != null) {
                 front.next.prev = front;
@@ -71,7 +72,7 @@ public class DoubleLinkedList<T> implements IList<T> {
         }else if (index == size - 1) {
             back.prev.next = new Node<T>(back.prev, item, null);
             back = back.prev.next;
-        }else {
+        } else {
             Node<T> current = getToIndex(index);
             Node<T> newNode = new Node<T>(current.prev, item, current.next);
             current.prev.next = newNode;
@@ -129,22 +130,22 @@ public class DoubleLinkedList<T> implements IList<T> {
     public T delete(int index) {
         outOfBounds(index);
         if (index == 0) {
+            size--;
             T first = front.data;
             front = front.next;
-            this.size--;
             return first;
-        }else if (index == size - 1){
+        } else if (index == size - 1){
+            size--;
             T last = back.data;
             back = back.prev;
             back.next = null;
-            this.size--;
             return last;
-        }else {
-        Node<T> current = getToIndex(index);
-        current.prev.next = current.next;
-        current.next.prev = current.prev;
-        this.size--;
-        return current.data;        
+        } else {
+            size--;
+            Node<T> current = getToIndex(index);
+            current.prev.next = current.next;
+            current.next.prev = current.prev; 
+            return current.data;        
         }
     }
 
@@ -155,10 +156,10 @@ public class DoubleLinkedList<T> implements IList<T> {
             for (int index = 0; index < size; index++) {
                 if (current.data == item || current.data.equals(item)) {
                     return index;
-                }else {
-                    current = current.next;
+                } else {
+                    current = current.next; 
                 }
-            }
+            }   
         }
         return -1;
     }
@@ -173,11 +174,11 @@ public class DoubleLinkedList<T> implements IList<T> {
         Node<T> current = front;
         if (current != null) {
             for (int i = 0; i < size; i++) {
-                if (current.data == other || (current.data != null && current.data.equals(other))) {
+                if (current.data == other ||(current.data != null && current.data.equals(other))) {
                     return true;
                 }
                 current = current.next;
-            }
+            }     
         }
         return false;
     }
@@ -224,7 +225,7 @@ public class DoubleLinkedList<T> implements IList<T> {
          * returns 'false' otherwise.
          */
         public boolean hasNext() {
-            return this.current != null;
+            return current != null;
         }
 
         /**
@@ -238,9 +239,9 @@ public class DoubleLinkedList<T> implements IList<T> {
             if (!this.hasNext()) {
                 throw new NoSuchElementException();
             }
-            T boi = this.current.data;
-            this.current = this.current.next;
-            return boi;
+            Node<T> newNode= current; 
+            current = current.next;
+            return newNode.data;
         }
     }
 }

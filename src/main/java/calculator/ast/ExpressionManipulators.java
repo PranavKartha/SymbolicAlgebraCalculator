@@ -2,6 +2,8 @@ package calculator.ast;
 
 import calculator.interpreter.Environment;
 import calculator.errors.EvaluationError;
+import calculator.gui.ImageDrawer;
+import datastructures.concrete.DoubleLinkedList;
 import datastructures.interfaces.IDictionary;
 import misc.exceptions.NotYetImplementedException;
 
@@ -70,16 +72,18 @@ public class ExpressionManipulators {
         // There are three types of nodes, so we have three cases. 
         if (node.isNumber()) {
             return node.getNumericValue();
-        } else if (node.isVariable()) {
-            AstNode newNode = variables.get(node.getName());
-            return toDoubleHelper(variables, newNode);
+        } else if (node.isVariable()) {         
+            String variable = node.getName();
+            return toDoubleHelper(variables, variables.get(variable));
+            //fix this
         } else {
+            return checkToDoubleOperations(node, variables);
             // You may assume the expression node has the correct number of children.
             // If you wish to make your code more robust, you can also use the provided
             // "assertNodeMatches" method to verify the input is valid.
-            return checkToDoubleOperations(node, variables);
         }
     }
+
     
     // Applies the effects of the inputed operation and returns a double value based
     // on the inputed AstNode and IDictionary<String, AstNode> references
@@ -147,48 +151,22 @@ public class ExpressionManipulators {
         assertNodeMatches(node, "simplify", 1);
 
         AstNode exprToConvert = node.getChildren().get(0);
-        return new AstNode(simplifyHelper(env.getVariables(), exprToConvert));
+        return handleSimplifyHelper(env.getVariables(), exprToConvert);
     }
     
-    //
-    private static double simplifyHelper(IDictionary<String, AstNode> variables, AstNode node) {
-        if (node.isNumber()) {
-            return node.getNumericValue();
-        } else if (node.isVariable()) {
-            AstNode newNode = variables.get(node.getName());
-            return simplifyHelper(variables, newNode);
-        } else if (node.isOperation()) {
-            return checkSimplifyOperations(variables, node);
+    private static AstNode handleSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node){
+        if(node.isOperation()){
+            if(node.getChildren().get(0).isOperation()) {
+                variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(0)));
+            }
+            if(node.getChildren().get(1).isOperation()) {
+                variables.put(node.getName(), handleSimplifyHelper(variables, node.getChildren().get(1)));
+            }
+            if(!node.getChildren().get(0).isOperation() && !node.getChildren().get(1).isOperation()){       
+                return new AstNode(toDoubleHelper(variables, node));
+            }
         }
-        return 0.0;
-    }
-    
-    //
-    private static double checkSimplifyOperations(IDictionary<String, AstNode> variables, AstNode node) {
-        String name = node.getName();
-        if (name.equals("+")) {
-            return simplifyHelper(variables, node.getChildren().get(0)) +
-                    simplifyHelper(variables, node.getChildren().get(1));
-        } else if (name.equals("-")) {
-            return simplifyHelper(variables, node.getChildren().get(0)) -
-                    simplifyHelper(variables, node.getChildren().get(1));
-        } else if (name.equals("*")) {
-            return simplifyHelper(variables, node.getChildren().get(0)) *
-                    simplifyHelper(variables, node.getChildren().get(1));
-        } else if (name.equals("/")) {
-            return simplifyHelper(variables, node.getChildren().get(0)) /
-                    simplifyHelper(variables, node.getChildren().get(1));
-        } else if (name.equals("^")) {
-            return Math.pow(simplifyHelper(variables, node.getChildren().get(0)),
-                    simplifyHelper(variables, node.getChildren().get(1)));
-        } else if (name.equals("negate")) {
-            return -1.0 * simplifyHelper(variables, node.getChildren().get(0));
-        } else if (name.equals("sin")) {
-            return Math.sin(simplifyHelper(variables, node.getChildren().get(0)));
-        } else if (name.equals("cos")) {
-            return Math.cos(simplifyHelper(variables, node.getChildren().get(0)));
-        }
-        return 0.0;
+        return node;   
     }
 
     /**
@@ -227,11 +205,23 @@ public class ExpressionManipulators {
      * @throws EvaluationError  if 'step' is zero or negative
      */
     public static AstNode plot(Environment env, AstNode node) {
+        
+        
         assertNodeMatches(node, "plot", 5);
 
-        // TODO: Your code here
-        throw new NotYetImplementedException();
-
+        AstNode newNode = node.getChildren().get(0);
+        AstNode exprToPlot = newNode.getChildren().get(0);
+        AstNode var = newNode.getChildren().get(1);
+        AstNode varMin = newNode.getChildren().get(2);
+        AstNode varMax = newNode.getChildren().get(3);
+        AstNode step = newNode.getChildren().get(4);
+        
+        IList<Double> xVars = new DoubleLinkedList<>();
+        IList<Double> yVars = new DoubleLinkedList<>();
+        
+        
+        ImageDrawer i = new ImageDrawer();
+        i.drawScatterPlot(, xAxisLabel, yAxisLabel, xValues, yValues);
         // Note: every single function we add MUST return an
         // AST node that your "simplify" function is capable of handling.
         // However, your "simplify" function doesn't really know what to do
@@ -242,5 +232,10 @@ public class ExpressionManipulators {
         // When working on this method, you should uncomment the following line:
         //
         // return new AstNode(1);
+    }
+    
+    //
+    private static AstNode handlePlot(AstNode node, IDictionary<String, AstNode> variables){
+        
     }
 }

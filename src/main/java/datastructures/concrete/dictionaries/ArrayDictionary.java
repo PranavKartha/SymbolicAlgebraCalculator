@@ -1,3 +1,6 @@
+
+
+
 package datastructures.concrete.dictionaries;
 
 import datastructures.interfaces.IDictionary;
@@ -8,16 +11,17 @@ import misc.exceptions.NoSuchKeyException;
  */
 public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     // You may not change or rename this field: we will be inspecting
-    // it using our private tests. 
-    private Pair<K, V>[] pairs;
-    private int size;
-    private int openCell;
+    // it using our private tests.
+    private Pair<K, V>[] pairs; //stores associations between keys and values
+    private int size; // number of key-value pairs stored
+    private int openCell; //next cell to fill
     
-    private static final int SIZE_AT_START = 10;
-    private static final int RESIZE_FACTOR = 2;
+    private static final int SIZE_AT_START = 10; //initial dictionary size
+    private static final int RESIZE_FACTOR = 2; // dictionary resizing factor
     
     // You're encouraged to add extra fields (and helper methods) though!
 
+    
     public ArrayDictionary() {
         pairs = makeArrayOfPairs(SIZE_AT_START);
         size = 0;
@@ -25,7 +29,7 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     }
 
     /**
-     * This method will return a new, empty array of the given size
+     *  This method will return a new, empty array of the given size
      * that can contain Pair<K, V> objects.
      *
      * Note that each element in the array will initially be null.
@@ -52,6 +56,8 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
         }
     }
     
+    
+
     @Override
     public V get(K key) {
         this.keyCheck(key);
@@ -65,6 +71,7 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
         }
         return null;
     }
+
 
     @Override
     public void put(K key, V value) {
@@ -89,6 +96,7 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
         }
     }
     
+
     private int findNewOpenCell() {
         for (int i = 0; i < this.pairs.length; i++) {
             if (pairs[i] == null) {
@@ -103,6 +111,8 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
         this.pairs = newPairs;
         return newOpenCell;
     }
+
+    
 
     @Override
     public V remove(K key) {
@@ -155,3 +165,4 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
         }
     }
 }
+

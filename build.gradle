@@ -71,8 +71,17 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
     }
+    dependencies {
+        classpath 'com.adarshr:gradle-test-logger-plugin:1.5.0'
+    }
+
 }
+
+apply plugin: 'com.adarshr.test-logger'
 
 // Configure antlr plugin
 generateGrammarSource {
@@ -111,17 +120,24 @@ allprojects {
     }
 }
 
-// Log stdout and stderr in tests
+testlogger {
+    theme 'standard'
+    showExceptions false
+    showSummary false
+    slowThreshold 1000
+    showStandardStreams false
+    showPassedStandardStreams false
+    showSkippedStandardStreams false
+    showFailedStandardStreams false
+}
+
 test {
-    testLogging {
-        events = ["passed", "skipped", "failed"]
-        showStandardStreams = true
-        exceptionFormat = "full"
+    if (System.properties['test.profile'] == 'part1') {
+        exclude '**/TestCalculator*'
     }
 
     reports {
-        html.enabled = false
+        html.enabled = true
         junitXml.enabled = true
     }
 }
-

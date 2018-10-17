@@ -4,9 +4,10 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import datastructures.interfaces.IList;
+
 import static org.junit.Assert.fail;
 
-import datastructures.interfaces.IList;
 
 /**
  * This class should contain all the tests you implement to verify that
@@ -23,15 +24,7 @@ import datastructures.interfaces.IList;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestDeleteFunctionality extends TestDoubleLinkedList {
 
-    /*
-    @Test(timeout=SECOND)
-    public void testExample() {
-        // Feel free to modify or delete this dummy test.
-        assertTrue(true); 
-        assertEquals(3, 3);
-    }
-    */
-    
+   
     @Test(timeout=SECOND)
     public void testDeleteBasic() {
         IList<String> list = makeBasicList();
@@ -101,4 +94,15 @@ public class TestDeleteFunctionality extends TestDoubleLinkedList {
         
         this.assertListMatches(new String[] {"a", "b", "c"}, list);
     }
+
 }
+    
+        
+
+
+        
+        
+    
+
+
+

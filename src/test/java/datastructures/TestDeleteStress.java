@@ -8,7 +8,7 @@ import datastructures.concrete.DoubleLinkedList;
 import datastructures.interfaces.IList;
 
 /**
- * This file should contain any tests that check and make sure your
+ *  This file should contain any tests that check and make sure your
  * delete method is efficient.
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -18,7 +18,7 @@ public class TestDeleteStress extends TestDoubleLinkedList {
     public void testExample() {
         // Feel free to modify or delete this dummy test.
         assertTrue(true);
-        assertEquals(3, 3); 
+        assertEquals(3, 3);
     }
     */
     
@@ -107,4 +107,4 @@ public class TestDeleteStress extends TestDoubleLinkedList {
         
         assertListMatches(new String[] {"a", "b", "c"}, list);
     }
-}
+}   
