@@ -166,30 +166,19 @@ public class ExpressionManipulators {
             if(node.getName().equals("sin") || node.getName().equals("cos")) {
                 if(node.getChildren().get(0).isNumber()) {
                     return node;
-                }//else if(node.getChildren().get(0).isOperation()) {
-                   // node.getChildren().set(0, new AstNode(toDoubleHelper(variables, node.getChildren().get(0))));
-                    //return node;
+                }
                 
             }
         }
         
-            if (node.getChildren().get(0).isOperation()) {
-                node.getChildren().set(0, handleSimplifyHelper(variables, node.getChildren().get(0)));
-            }
+       if (node.getChildren().get(0).isOperation()) {
+        node.getChildren().set(0, handleSimplifyHelper(variables, node.getChildren().get(0)));
+       }
             
-            if(node.getChildren().size() == 2 && node.getChildren().get(1).isOperation()) {
-                node.getChildren().set(1, handleSimplifyHelper(variables, node.getChildren().get(1)));
-            }
-            AstNode kid1 = node.getChildren().get(0);
-            AstNode kid2 = null;
-            
-            if(node.getChildren().size() == 2) {
-                kid2 = node.getChildren().get(1);
-            }
-            if ((kid1.isVariable() && !variables.containsKey(kid1.getName())) || 
-                    (kid2!= null && kid2.isVariable() && !variables.containsKey(kid2.getName()))){
-                return node;
-            }
+        if(node.getChildren().size() == 2 && node.getChildren().get(1).isOperation()) {
+            node.getChildren().set(1, handleSimplifyHelper(variables, node.getChildren().get(1)));
+        }
+
         
         return new AstNode(toDoubleHelper(variables, node));             
      }    
@@ -255,6 +244,7 @@ public class ExpressionManipulators {
         
         IList<Double> xValues = new DoubleLinkedList<Double>();
         IList<Double> yValues = new DoubleLinkedList<Double>();
+
         for(double i = varMin.getNumericValue(); i <= varMax.getNumericValue(); i += step.getNumericValue()) {
             xValues.add(i);
         }
