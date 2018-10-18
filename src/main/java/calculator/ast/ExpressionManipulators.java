@@ -187,7 +187,7 @@ public class ExpressionManipulators {
                 kid1 = new AstNode(toDoubleHelper(variables, kid1));
                 node = handleSimplifyHelper(variables, node);
                 // something something this wouldn't work but is on the way to
-            }
+            } 
             
             if (kid2 != null && (kid1.isVariable() && variables.containsKey(kid1.getName()))) {
                 
