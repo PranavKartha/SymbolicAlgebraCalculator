@@ -219,7 +219,7 @@ public class ExpressionManipulators {
      * @throws EvaluationError  if any of the expressions contains an undefined variable.
      * @throws EvaluationError  if varMin > varMax
      * @throws EvaluationError  if 'var' was already defined
-     * @throws EvaluationError  if 'step' is zero or negative
+     * @throws EvaluationError  if 'step' is zero or negative 
      */
     public static AstNode plot(Environment env, AstNode node) {
         
