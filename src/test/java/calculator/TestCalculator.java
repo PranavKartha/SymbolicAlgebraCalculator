@@ -59,10 +59,11 @@ public class TestCalculator extends BaseTest {
         calc.evaluate("y := x + 5"); // x+5
         assertEquals("1", calc.evaluate("x := 1")); 
         assertEquals("2", calc.evaluate("z := x + 1"));
-        assertEquals("6", calc.evaluate("y"));        
+        assertEquals("6", calc.evaluate("y"));
+        
         assertEquals("5", calc.evaluate("x := 5"));
         assertEquals("2", calc.evaluate("z"));
-
+        assertEquals("10", calc.evaluate("y"));
     }
 
     @Test(timeout=SECOND)

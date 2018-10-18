@@ -162,7 +162,16 @@ public class ExpressionManipulators {
     }
     
     private static AstNode handleSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node){
-        if (node.isOperation()){
+        if (node.isVariable()){
+            
+            if (variables.containsKey(node.getName())) {
+                return variables.get(node.getName());
+            } else {
+                return node;
+            }
+            
+        } else if (node.isOperation()){
+            
             if(node.getName().equals("sin")||node.getName().equals("cos")||node.getName().equals("/")) {
                 return node;
             }
@@ -184,32 +193,9 @@ public class ExpressionManipulators {
                     (kid2 != null && (kid2.isVariable() && !variables.containsKey(kid2.getName())))){
                 return node;
             }
-<<<<<<< HEAD
-            
-
-
-=======
-            /* new shit from here...
-            if (kid1.isVariable() && variables.containsKey(kid1.getName())) {
-                AstNode oldKid1 = variables.get(kid1.getName());
-                kid1 = new AstNode(toDoubleHelper(variables, kid1));
-                node = handleSimplifyHelper(variables, node);
-                // something something this wouldn't work but is on the way to
-            } 
-            
-            if (kid2 != null && (kid1.isVariable() && variables.containsKey(kid1.getName()))) {
-                
-            }
-            
-            // ... to here */
->>>>>>> branch 'master' of git@gitlab.cs.washington.edu:cse373-18au-student-projects/hw2-firefly.git
         }
-        
-        if (node.isVariable() && !variables.containsKey(node.getName())) {
-            return node;
-        }
-        
-        return new AstNode(toDoubleHelper(variables, node));             
+
+        return new AstNode(toDoubleHelper(variables, node));           
      }    
         
     
