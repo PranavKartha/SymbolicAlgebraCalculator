@@ -181,6 +181,11 @@ public class ExpressionManipulators {
                     (kid2 != null && (kid2.isVariable() && !variables.containsKey(kid2.getName())))){
                 return node;
             }
+            
+            if (kid1.isVariable() && variables.containsKey(kid1.getName())) {
+                variables.put(kid1.getName(), node);
+            }
+
         }
         
         if (node.isVariable() && !variables.containsKey(node.getName())) {
@@ -236,6 +241,14 @@ public class ExpressionManipulators {
         AstNode varMax = node.getChildren().get(3);
         AstNode step = node.getChildren().get(4);
         
+        double varMinValue = 0;
+        double varMinValue = 0;
+         if(varMin.isNumber()) {
+             varMinValue = varMin.getNumericValue();
+         }else {
+             
+         }
+        
         if (!allVarsExist(node, env.getVariables())) {
             throw new EvaluationError("undefined expression!");
         }
@@ -251,6 +264,7 @@ public class ExpressionManipulators {
         
         IList<Double> xValues = new DoubleLinkedList<Double>();
         IList<Double> yValues = new DoubleLinkedList<Double>();
+
         
         for(double i = varMin.getNumericValue(); i <= varMax.getNumericValue(); i += step.getNumericValue()) {
             xValues.add(i);
