@@ -163,6 +163,9 @@ public class ExpressionManipulators {
     
     private static AstNode handleSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node){
         if (node.isOperation()){
+            if(node.getName().equals("sin")||node.getName().equals("cos")||node.getName().equals("/")) {
+                return node;
+            }
             if (node.getChildren().get(0).isOperation()) {
                 node.getChildren().set(0, handleSimplifyHelper(variables, node.getChildren().get(0)));
             }
@@ -182,9 +185,7 @@ public class ExpressionManipulators {
                 return node;
             }
             
-            if (kid1.isVariable() && variables.containsKey(kid1.getName())) {
-                variables.put(kid1.getName(), node);
-            }
+
 
         }
         
@@ -241,13 +242,7 @@ public class ExpressionManipulators {
         AstNode varMax = node.getChildren().get(3);
         AstNode step = node.getChildren().get(4);
         
-        double varMinValue = 0;
-        double varMinValue = 0;
-         if(varMin.isNumber()) {
-             varMinValue = varMin.getNumericValue();
-         }else {
-             
-         }
+      
         
         if (!allVarsExist(node, env.getVariables())) {
             throw new EvaluationError("undefined expression!");
