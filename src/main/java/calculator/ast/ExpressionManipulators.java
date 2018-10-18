@@ -163,22 +163,27 @@ public class ExpressionManipulators {
     
     private static AstNode handleSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node){
         if (node.isVariable()){
-            
+            // node is a variable
             if (variables.containsKey(node.getName())) {
-                return variables.get(node.getName());
+                return variables.get(node.getName()); //if the variable has a 
+                // stored value, return the associated node from variables
             } else {
-                return node;
+                return node; // node has no associated value
             }
             
         } else if (node.isOperation()){
-            
+            // node is an operation
+            // Don't need to simplify these expressions
             if(node.getName().equals("sin")||node.getName().equals("cos")||node.getName().equals("/")) {
                 return node;
             }
+            // if one kid is an operation, simplify that operation
             if (node.getChildren().get(0).isOperation()) {
                 node.getChildren().set(0, handleSimplifyHelper(variables, node.getChildren().get(0)));
             }
             
+            // if another kid is an operation (assuming kid exists), simplify that
+            // as well
             if(node.getChildren().size() == 2 && node.getChildren().get(1).isOperation()) {
                 node.getChildren().set(1, handleSimplifyHelper(variables, node.getChildren().get(1)));
             }
@@ -189,12 +194,14 @@ public class ExpressionManipulators {
                 kid2 = node.getChildren().get(1);
             }
             
+            // if the simplifications of either child lead to undefined variables, 
+            // return this node as is
             if ((kid1.isVariable() && !variables.containsKey(kid1.getName())) || 
                     (kid2 != null && (kid2.isVariable() && !variables.containsKey(kid2.getName())))){
                 return node;
             }
         }
-
+        // return a new Double node with the math applied to it
         return new AstNode(toDoubleHelper(variables, node));           
      }    
         
