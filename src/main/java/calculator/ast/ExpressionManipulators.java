@@ -170,18 +170,23 @@ public class ExpressionManipulators {
             if(node.getChildren().size() == 2 && node.getChildren().get(1).isOperation()) {
                 node.getChildren().set(1, handleSimplifyHelper(variables, node.getChildren().get(1)));
             }
+            
             AstNode kid1 = node.getChildren().get(0);
             AstNode kid2 = null;
-            
             if (node.getChildren().size() == 2) {
-                
-            kid2 = node.getChildren().get(1);
+                kid2 = node.getChildren().get(1);
             }
+            
             if ((kid1.isVariable() && !variables.containsKey(kid1.getName())) || 
                     (kid2 != null && (kid2.isVariable() && !variables.containsKey(kid2.getName())))){
                 return node;
             }
         }
+        
+        if (node.isVariable() && !variables.containsKey(node.getName())) {
+            return node;
+        }
+        
         return new AstNode(toDoubleHelper(variables, node));             
      }    
         
