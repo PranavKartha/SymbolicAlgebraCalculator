@@ -163,6 +163,9 @@ public class ExpressionManipulators {
     
     private static AstNode handleSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node){
         if (node.isOperation()){
+            if(node.getName().equals("sin")||node.getName().equals("cos")||node.getName().equals("/")) {
+                return node;
+            }
             if (node.getChildren().get(0).isOperation()) {
                 node.getChildren().set(0, handleSimplifyHelper(variables, node.getChildren().get(0)));
             }
@@ -181,6 +184,11 @@ public class ExpressionManipulators {
                     (kid2 != null && (kid2.isVariable() && !variables.containsKey(kid2.getName())))){
                 return node;
             }
+<<<<<<< HEAD
+            
+
+
+=======
             /* new shit from here...
             if (kid1.isVariable() && variables.containsKey(kid1.getName())) {
                 AstNode oldKid1 = variables.get(kid1.getName());
@@ -194,6 +202,7 @@ public class ExpressionManipulators {
             }
             
             // ... to here */
+>>>>>>> branch 'master' of git@gitlab.cs.washington.edu:cse373-18au-student-projects/hw2-firefly.git
         }
         
         if (node.isVariable() && !variables.containsKey(node.getName())) {
@@ -249,6 +258,8 @@ public class ExpressionManipulators {
         AstNode varMax = node.getChildren().get(3);
         AstNode step = node.getChildren().get(4);
         
+      
+        
         if (!allVarsExist(node, env.getVariables())) {
             throw new EvaluationError("undefined expression!");
         }
@@ -264,6 +275,7 @@ public class ExpressionManipulators {
         
         IList<Double> xValues = new DoubleLinkedList<Double>();
         IList<Double> yValues = new DoubleLinkedList<Double>();
+
         
         for(double i = varMin.getNumericValue(); i <= varMax.getNumericValue(); i += step.getNumericValue()) {
             xValues.add(i);
