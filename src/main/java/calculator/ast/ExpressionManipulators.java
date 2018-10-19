@@ -174,9 +174,15 @@ public class ExpressionManipulators {
         } else if (node.isOperation()){
             // node is an operation
             // Don't need to simplify these expressions
-            if(node.getName().equals("sin")||node.getName().equals("cos")||node.getName().equals("/")) {
+            if(node.getName().equals("/")) {
                 return node;
             }
+            
+            if (node.getName().equals("sin")||node.getName().equals("cos")) {
+                node.getChildren().set(0, handleSimplifyHelper(variables, node.getChildren().get(0)));
+                return node;
+            }
+            
             // if one kid is an operation, simplify that operation
             if (node.getChildren().get(0).isOperation()) {
                 node.getChildren().set(0, handleSimplifyHelper(variables, node.getChildren().get(0)));
@@ -194,8 +200,8 @@ public class ExpressionManipulators {
                 kid2 = node.getChildren().get(1);
             }
             
-            // if the simplifications of either child lead to undefined variables, 
-            // return this node as is
+            // if the simplifications of either child lead to undefined variables, return
+            // this node as is
             if ((kid1.isVariable() && !variables.containsKey(kid1.getName())) || 
                     (kid2 != null && (kid2.isVariable() && !variables.containsKey(kid2.getName())))){
                 return node;
