@@ -94,7 +94,15 @@ public class TestDeleteFunctionality extends TestDoubleLinkedList {
         
         this.assertListMatches(new String[] {"a", "b", "c"}, list);
     }
-
+    
+    @Test(timeout=SECOND)
+    public void testSHITSHITSHIT() {
+        IList<String> list = makeBasicList();
+        
+        assertEquals("b", list.get(1));
+        assertEquals("b", list.delete(1));
+        assertEquals("c", list.get(1));
+    }
 }
     
         

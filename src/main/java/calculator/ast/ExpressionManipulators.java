@@ -162,68 +162,12 @@ public class ExpressionManipulators {
     }
     
     private static AstNode handleSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node){
-        /*  this stuff is apparently shit
-        if (node.isVariable()){
-            // node is a variable
-            if (variables.containsKey(node.getName())) {
-                return handleSimplifyHelper(variables, variables.get(node.getName())); 
-                // if the variable has a stored value, return 
-                // the associated node from variables
-            } else {
-                return node; // node has no associated value
-            }
-            
-        } else if (node.isOperation()){
-            // node is an operation
-            // Don't need to simplify these expressions
-            if(node.getName().equals("/")) {
-                return node;
-            }
-            
-            if (node.getName().equals("sin")||node.getName().equals("cos")) {
-                node.getChildren().set(0, handleSimplifyHelper(variables, node.getChildren().get(0)));
-                return node;
-            }
-            
-            if (node.getChildren().get(0).isNumber() && 
-                    (node.getChildren().size() == 2 && node.getChildren().get(1).isNumber()))
-                if (node.getName().equals("+") || node.getName().equals("-") || node.getName().equals("*")) {
-                    return new AstNode(toDoubleHelper(variables, node));
-                }
-            
-            // if one kid is an operation, simplify that operation
-            if (node.getChildren().get(0).isOperation()) {
-                node.getChildren().set(0, handleSimplifyHelper(variables, node.getChildren().get(0)));
-            }
-            
-            // if another kid is an operation (assuming kid exists), simplify that
-            // as well
-            if(node.getChildren().size() == 2 && node.getChildren().get(1).isOperation()) {
-                node.getChildren().set(1, handleSimplifyHelper(variables, node.getChildren().get(1)));
-            }
-            
-            AstNode kid1 = node.getChildren().get(0);
-            AstNode kid2 = null;
-            if (node.getChildren().size() == 2) {
-                kid2 = node.getChildren().get(1);
-            }
-            
-            // if the simplifications of either child lead to undefined variables, return
-            // this node as is
-            if ((kid1.isVariable() && !variables.containsKey(kid1.getName())) || 
-                    (kid2 != null && (kid2.isVariable() && !variables.containsKey(kid2.getName())))){
-                return node;
-            }
-        }
-        // return a new Double node with the math applied to it
-        return new AstNode(toDoubleHelper(variables, node)); */   
         
         if (node.isNumber()) {
             return node;
             
         } else if (node.isVariable()) {
             if (variables.containsKey(node.getName())) {
-                
                 return handleSimplifyHelper(variables, variables.get(node.getName()));
             } else {
                 return node;
@@ -246,30 +190,16 @@ public class ExpressionManipulators {
                 if (node.getChildren().get(0).isNumber() && node.getChildren().get(1).isNumber()) {
                     return new AstNode(toDoubleHelper(variables, node));
                 } else {
-                   // AstNode newNode = new AstNode(node.getName(),node.getChildren());
+                    AstNode nodeOG = new AstNode(node.getName(),node.getChildren());
                     
                     node.getChildren().set(0, handleSimplifyHelper(variables, node.getChildren().get(0)));
-                    node.getChildren().set(1, handleSimplifyHelper(variables, node.getChildren().get(1)));
-
                     
-                    /*if (node.getChildren().get(0).isVariable()) {
-                        if (variables.containsKey(node.getChildren().get(0).getName())) {
-                            node.getChildren().set(0, 
-                                    new AstNode(variables.get(node.getChildren().get(0).getName()).getName()));
-                        }
-                    }
-                    if (node.getChildren().get(1).isVariable()) {
-                        if (variables.containsKey(node.getChildren().get(1).getName())) {
-                            node.getChildren().set(1, 
-                                    new AstNode(variables.get(node.getChildren().get(1).getName()).getName()));
-                        }
-                    }*/
-                   
+                    node.getChildren().set(1, handleSimplifyHelper(variables, node.getChildren().get(1)));
                     
                     if (node.getChildren().get(0).isNumber() && node.getChildren().get(1).isNumber()) {
                         return new AstNode(toDoubleHelper(variables, node));
                     }else {
-                        return node;
+                        return nodeOG;
                     }
                 }
             }
@@ -315,9 +245,19 @@ public class ExpressionManipulators {
      * @throws EvaluationError  if 'step' is zero or negative 
      */
     public static AstNode plot(Environment env, AstNode node) {
-        
-        assertNodeMatches(node, "plot", 5);
 
+        // Note: every single function we add MUST return an
+        // AST node that your "simplify" function is capable of handling.
+        // However, your "simplify" function doesn't really know what to do
+        // with "plot" functions (and what is the "plot" function supposed to
+        // evaluate to anyways?) so we'll settle for just returning an
+        // arbitrary number.
+        //
+        // When working on this method, you should uncomment the following line:
+        //
+        // return new AstNode(1);
+        assertNodeMatches(node, "plot", 5);
+        
         AstNode exprToPlot = node.getChildren().get(0);
         AstNode var = node.getChildren().get(1);
         AstNode varMin = node.getChildren().get(2);
@@ -388,15 +328,4 @@ public class ExpressionManipulators {
             }
         }
     }
-
-        // Note: every single function we add MUST return an
-        // AST node that your "simplify" function is capable of handling.
-        // However, your "simplify" function doesn't really know what to do
-        // with "plot" functions (and what is the "plot" function supposed to
-        // evaluate to anyways?) so we'll settle for just returning an
-        // arbitrary number.
-        //
-        // When working on this method, you should uncomment the following line:
-        //
-        // return new AstNode(1);
 }

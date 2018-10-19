@@ -77,7 +77,7 @@ public class DoubleLinkedList<T> implements IList<T> {
             Node<T> newNode = new Node<T>(current.prev, item, current.next);
             current.prev.next = newNode;
             current.next.prev = newNode;
-        }    
+        }
     }
 
     private Node<T> getToIndex(int index){
@@ -133,6 +133,7 @@ public class DoubleLinkedList<T> implements IList<T> {
             size--;
             T first = front.data;
             front = front.next;
+            front.prev = null;
             return first;
         } else if (index == size - 1){
             size--;
@@ -141,11 +142,13 @@ public class DoubleLinkedList<T> implements IList<T> {
             back.next = null;
             return last;
         } else {
-            size--;
             Node<T> current = getToIndex(index);
             current.prev.next = current.next;
-            current.next.prev = current.prev; 
-            return current.data;        
+            current.next.prev = current.prev;
+            current.next = null;
+            current.prev = null;
+            size--;
+            return current.data;
         }
     }
 
