@@ -162,11 +162,13 @@ public class ExpressionManipulators {
     }
     
     private static AstNode handleSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node){
+        /*  this stuff is apparently shit
         if (node.isVariable()){
             // node is a variable
             if (variables.containsKey(node.getName())) {
-                return variables.get(node.getName()); //if the variable has a 
-                // stored value, return the associated node from variables
+                return handleSimplifyHelper(variables, variables.get(node.getName())); 
+                // if the variable has a stored value, return 
+                // the associated node from variables
             } else {
                 return node; // node has no associated value
             }
@@ -182,6 +184,12 @@ public class ExpressionManipulators {
                 node.getChildren().set(0, handleSimplifyHelper(variables, node.getChildren().get(0)));
                 return node;
             }
+            
+            if (node.getChildren().get(0).isNumber() && 
+                    (node.getChildren().size() == 2 && node.getChildren().get(1).isNumber()))
+                if (node.getName().equals("+") || node.getName().equals("-") || node.getName().equals("*")) {
+                    return new AstNode(toDoubleHelper(variables, node));
+                }
             
             // if one kid is an operation, simplify that operation
             if (node.getChildren().get(0).isOperation()) {
@@ -208,7 +216,62 @@ public class ExpressionManipulators {
             }
         }
         // return a new Double node with the math applied to it
-        return new AstNode(toDoubleHelper(variables, node));           
+        return new AstNode(toDoubleHelper(variables, node)); */   
+        
+        if (node.isNumber()) {
+            return node;
+            
+        } else if (node.isVariable()) {
+            if (variables.containsKey(node.getName())) {
+                
+                return variables.get(node.getName());
+            } else {
+                return node;
+            }
+            
+        } else {
+            // node MUST be an operation here
+            if (node.getName().equals("sin") || node.getName().equals("cos") || node.getName().equals("negate")) {
+                node.getChildren().set(0, 
+                        handleSimplifyHelper(variables, node.getChildren().get(0)));
+                return node;
+            }
+            if (node.getName().equals("/")) {
+                return node;
+            }
+            
+            
+            
+            
+            if (node.getName().equals("+") || node.getName().equals("-") || node.getName().equals("*")) {
+                if (node.getChildren().get(0).isNumber() && node.getChildren().get(1).isNumber()) {
+                    return new AstNode(toDoubleHelper(variables, node));
+                } else {
+                    
+                    /*if (node.getChildren().get(0).isVariable()) {
+                        if (variables.containsKey(node.getChildren().get(0).getName())) {
+                            node.getChildren().set(0, 
+                                    new AstNode(toDoubleHelper(variables, node.getChildren().get(0))));
+                        }
+                    }
+                    if (node.getChildren().get(1).isVariable()) {
+                        if (variables.containsKey(node.getChildren().get(1).getName())) {
+                            node.getChildren().set(1, 
+                                    new AstNode(toDoubleHelper(variables, node.getChildren().get(1))));
+                        }
+                    }
+                    
+                    // DONT SET
+                    */
+                    node.getChildren().set(0, handleSimplifyHelper(variables, node.getChildren().get(0)));
+                    node.getChildren().set(1, handleSimplifyHelper(variables, node.getChildren().get(1)));
+                    
+                    
+                }
+            }
+            return node;
+        }
+        
      }    
         
     
