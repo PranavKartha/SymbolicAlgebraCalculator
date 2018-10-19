@@ -40,7 +40,7 @@ public class ExpressionManipulators {
      * - The 'node' parameter is an operation AstNode with the name 'toDouble'.
      * - The 'node' parameter has exactly one child: the AstNode to convert into a double.
      *
-     * Postconditions:
+     * Postconditions: 
      *
      * - Returns a number AstNode containing the computed double.
      *

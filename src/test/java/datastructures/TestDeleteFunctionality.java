@@ -9,7 +9,7 @@ import datastructures.interfaces.IList;
 import static org.junit.Assert.fail;
 
 
-/**
+/** 
  * This class should contain all the tests you implement to verify that
  * your 'delete' method behaves as specified.
  *

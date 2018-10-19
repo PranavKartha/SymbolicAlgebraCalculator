@@ -211,7 +211,7 @@ public class DoubleLinkedList<T> implements IList<T> {
             this(null, data, null);
         }
 
-        // Feel free to add additional constructors or methods to this class.
+        //  Feel free to add additional constructors or methods to this class.
     }
 
     private static class DoubleLinkedListIterator<T> implements Iterator<T> {
