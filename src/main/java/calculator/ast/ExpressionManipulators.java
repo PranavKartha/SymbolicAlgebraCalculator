@@ -77,11 +77,10 @@ public class ExpressionManipulators {
             return node.getNumericValue();
         } else if (node.isVariable()) {         
             String variable = node.getName();
-            if (variables.containsKey(variable)) {
-                return toDoubleHelper(variables, variables.get(variable));
+            if (!variables.containsKey(variable)) {
+                throw new EvaluationError("variable has no definition");
             }
-            return 0;
-            //fix this
+            return toDoubleHelper(variables, variables.get(variable));
         } else {
             return checkToDoubleOperations(node, variables);
             // You may assume the expression node has the correct number of children.
@@ -118,8 +117,9 @@ public class ExpressionManipulators {
             return Math.sin(toDoubleHelper(variables, node.getChildren().get(0)));
         } else if (name.equals("cos")) {
             return Math.cos(toDoubleHelper(variables, node.getChildren().get(0)));
+        } else {
+            throw new EvaluationError("unknown operation");
         }
-        return 0.0;
     }
 
     /**
@@ -224,7 +224,7 @@ public class ExpressionManipulators {
         } else if (node.isVariable()) {
             if (variables.containsKey(node.getName())) {
                 
-                return variables.get(node.getName());
+                return handleSimplifyHelper(variables, variables.get(node.getName()));
             } else {
                 return node;
             }
@@ -240,33 +240,37 @@ public class ExpressionManipulators {
                 return node;
             }
             
-            
-            
-            
+           
+
             if (node.getName().equals("+") || node.getName().equals("-") || node.getName().equals("*")) {
                 if (node.getChildren().get(0).isNumber() && node.getChildren().get(1).isNumber()) {
                     return new AstNode(toDoubleHelper(variables, node));
                 } else {
+                   // AstNode newNode = new AstNode(node.getName(),node.getChildren());
+                    
+                    node.getChildren().set(0, handleSimplifyHelper(variables, node.getChildren().get(0)));
+                    node.getChildren().set(1, handleSimplifyHelper(variables, node.getChildren().get(1)));
+
                     
                     /*if (node.getChildren().get(0).isVariable()) {
                         if (variables.containsKey(node.getChildren().get(0).getName())) {
                             node.getChildren().set(0, 
-                                    new AstNode(toDoubleHelper(variables, node.getChildren().get(0))));
+                                    new AstNode(variables.get(node.getChildren().get(0).getName()).getName()));
                         }
                     }
                     if (node.getChildren().get(1).isVariable()) {
                         if (variables.containsKey(node.getChildren().get(1).getName())) {
                             node.getChildren().set(1, 
-                                    new AstNode(toDoubleHelper(variables, node.getChildren().get(1))));
+                                    new AstNode(variables.get(node.getChildren().get(1).getName()).getName()));
                         }
+                    }*/
+                   
+                    
+                    if (node.getChildren().get(0).isNumber() && node.getChildren().get(1).isNumber()) {
+                        return new AstNode(toDoubleHelper(variables, node));
+                    }else {
+                        return node;
                     }
-                    
-                    // DONT SET
-                    */
-                    node.getChildren().set(0, handleSimplifyHelper(variables, node.getChildren().get(0)));
-                    node.getChildren().set(1, handleSimplifyHelper(variables, node.getChildren().get(1)));
-                    
-                    
                 }
             }
             return node;
