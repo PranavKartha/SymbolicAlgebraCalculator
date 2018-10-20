@@ -40,7 +40,7 @@ public class ExpressionManipulators {
      * - The 'node' parameter is an operation AstNode with the name 'toDouble'.
      * - The 'node' parameter has exactly one child: the AstNode to convert into a double.
      *
-     * Postconditions: 
+     * Postconditions:
      *
      * - Returns a number AstNode containing the computed double.
      *
@@ -77,10 +77,11 @@ public class ExpressionManipulators {
             return node.getNumericValue();
         } else if (node.isVariable()) {         
             String variable = node.getName();
-            if (!variables.containsKey(variable)) {
-                throw new EvaluationError("variable has no definition");
+            if (variables.containsKey(variable)) {
+                return toDoubleHelper(variables, variables.get(variable));
             }
-            return toDoubleHelper(variables, variables.get(variable));
+            return 0;
+            //fix this
         } else {
             return checkToDoubleOperations(node, variables);
             // You may assume the expression node has the correct number of children.
@@ -117,9 +118,8 @@ public class ExpressionManipulators {
             return Math.sin(toDoubleHelper(variables, node.getChildren().get(0)));
         } else if (name.equals("cos")) {
             return Math.cos(toDoubleHelper(variables, node.getChildren().get(0)));
-        } else {
-            throw new EvaluationError("unknown operation");
         }
+        return 0.0;
     }
 
     /**
@@ -162,16 +162,14 @@ public class ExpressionManipulators {
     }
     
     private static AstNode handleSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node){
-        
         if (node.isNumber()) {
-            return node;
+            return new AstNode(node.getNumericValue());
             
         } else if (node.isVariable()) {
             if (variables.containsKey(node.getName())) {
                 return handleSimplifyHelper(variables, variables.get(node.getName()));
-            } else {
-                return node;
             }
+            return new AstNode(node.getName());
             
         } else {
             // node MUST be an operation here
@@ -181,33 +179,45 @@ public class ExpressionManipulators {
                 return node;
             }
             if (node.getName().equals("/")) {
+                AstNode left = node.getChildren().get(0);
+                AstNode right = node.getChildren().get(1);
+                
+                left = handleSimplifyHelper(variables, left);
+                right = handleSimplifyHelper(variables, right);
+                
+                AstNode newNode = new AstNode(node.getName());
+                
+                node.getChildren().set(0, left);
+                node.getChildren().set(1, right);
+                
                 return node;
             }
             
-           
-
             if (node.getName().equals("+") || node.getName().equals("-") || node.getName().equals("*")) {
                 if (node.getChildren().get(0).isNumber() && node.getChildren().get(1).isNumber()) {
                     return new AstNode(toDoubleHelper(variables, node));
                 } else {
-                    AstNode nodeOG = new AstNode(node.getName(),node.getChildren());
                     
-                    node.getChildren().set(0, handleSimplifyHelper(variables, node.getChildren().get(0)));
+                    AstNode left = handleSimplifyHelper(variables, node.getChildren().get(0));
+                    AstNode newNode = new AstNode(toDoubleHelper(variables, node));
+                    AstNode right = handleSimplifyHelper(variables, node.getChildren().get(1));
                     
-                    node.getChildren().set(1, handleSimplifyHelper(variables, node.getChildren().get(1)));
+                    node.getChildren().set(0, left);
+                    node.getChildren().set(1, right);
                     
-                    if (node.getChildren().get(0).isNumber() && node.getChildren().get(1).isNumber()) {
-                        return new AstNode(toDoubleHelper(variables, node));
-                    }else {
-                        return nodeOG;
+                    newNode.getChildren().add(left);
+                    newNode.getChildren().add(right);
+                    
+                    if (left.isNumber() && right.isNumber()) {
+                        return new AstNode(toDoubleHelper(variables, newNode));
                     }
                 }
             }
             return node;
         }
-        
-     }    
-        
+    }
+    
+    
     
     /**
      * Accepts an Environment variable and a 'plot(exprToPlot, var, varMin, varMax, step)'
@@ -245,19 +255,9 @@ public class ExpressionManipulators {
      * @throws EvaluationError  if 'step' is zero or negative 
      */
     public static AstNode plot(Environment env, AstNode node) {
-
-        // Note: every single function we add MUST return an
-        // AST node that your "simplify" function is capable of handling.
-        // However, your "simplify" function doesn't really know what to do
-        // with "plot" functions (and what is the "plot" function supposed to
-        // evaluate to anyways?) so we'll settle for just returning an
-        // arbitrary number.
-        //
-        // When working on this method, you should uncomment the following line:
-        //
-        // return new AstNode(1);
-        assertNodeMatches(node, "plot", 5);
         
+        assertNodeMatches(node, "plot", 5);
+
         AstNode exprToPlot = node.getChildren().get(0);
         AstNode var = node.getChildren().get(1);
         AstNode varMin = node.getChildren().get(2);
@@ -328,4 +328,15 @@ public class ExpressionManipulators {
             }
         }
     }
+
+        // Note: every single function we add MUST return an
+        // AST node that your "simplify" function is capable of handling.
+        // However, your "simplify" function doesn't really know what to do
+        // with "plot" functions (and what is the "plot" function supposed to
+        // evaluate to anyways?) so we'll settle for just returning an
+        // arbitrary number.
+        //
+        // When working on this method, you should uncomment the following line:
+        //
+        // return new AstNode(1);
 }
