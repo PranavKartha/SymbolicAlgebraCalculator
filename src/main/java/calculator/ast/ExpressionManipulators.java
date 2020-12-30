@@ -80,8 +80,7 @@ public class ExpressionManipulators {
             if (variables.containsKey(variable)) {
                 return toDoubleHelper(variables, variables.get(variable));
             }
-            return 0;
-            //fix this
+            throw new EvaluationError("unknown variable");
         } else {
             return checkToDoubleOperations(node, variables);
             // You may assume the expression node has the correct number of children.
@@ -119,7 +118,7 @@ public class ExpressionManipulators {
         } else if (name.equals("cos")) {
             return Math.cos(toDoubleHelper(variables, node.getChildren().get(0)));
         }
-        return 0.0;
+        throw new EvaluationError("unknown operation");
     }
 
     /**
@@ -161,13 +160,50 @@ public class ExpressionManipulators {
         return handleSimplifyHelper(env.getVariables(), exprToConvert);
     }
     
+//    //
+//    private static AstNode makeCopy(AstNode node, IList<AstNode> children) {
+//        if (children.size() == 0) {
+//            if (node.isNumber()) {
+//                return new AstNode(node.getNumericValue());
+//            } else {
+//                return new AstNode(node.getName());
+//            }
+//        } else {
+//            
+//            IList<AstNode> kids = new DoubleLinkedList<AstNode>();
+//            kids.add(makeCopy(children.get(0), children.get(0).getChildren()));
+//            if (children.size() == 2) {
+//                kids.add(makeCopy(children.get(1), children.get(1).getChildren()));
+//            }
+//            AstNode copy = new AstNode(node.getName(), kids);
+//            
+//            return copy;
+//        }
+//    }
+    
     private static AstNode handleSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node){
         if (node.isNumber()) {
             return new AstNode(node.getNumericValue());
             
         } else if (node.isVariable()) {
             if (variables.containsKey(node.getName())) {
-                return handleSimplifyHelper(variables, variables.get(node.getName()));
+                AstNode check = variables.get(node.getName());
+//                AstNode varGetCopy;
+//                if (check.isOperation()) {
+//                    varGetCopy = makeCopy(check, check.getChildren());
+//                } else { //possible variable case for later
+//                    varGetCopy = new AstNode(check.getNumericValue());
+//                    return varGetCopy;
+//                }
+//                varGetCopy = handleSimplifyHelper(variables, varGetCopy);
+////                IDictionary<String, AstNode> newVariables = new ArrayDictionary<String, AstNode>();
+////                for (int i = 0; i < variables.size(); i++) {
+////                    newVariables.put(variables., value);
+////                }
+                return handleSimplifyHelper(variables, check);
+//                // need to show results of handleSimplifyHelper
+//                // on varGetCopy BUT need that to be isolated from the
+//                // variables dictioanry
             }
             return new AstNode(node.getName());
             
@@ -178,14 +214,12 @@ public class ExpressionManipulators {
                         handleSimplifyHelper(variables, node.getChildren().get(0)));
                 return node;
             }
-            if (node.getName().equals("/")) {
+            if (node.getName().equals("/") || node.getName().equals("^")) {
                 AstNode left = node.getChildren().get(0);
                 AstNode right = node.getChildren().get(1);
                 
                 left = handleSimplifyHelper(variables, left);
                 right = handleSimplifyHelper(variables, right);
-                
-                AstNode newNode = new AstNode(node.getName());
                 
                 node.getChildren().set(0, left);
                 node.getChildren().set(1, right);
@@ -199,17 +233,22 @@ public class ExpressionManipulators {
                 } else {
                     
                     AstNode left = handleSimplifyHelper(variables, node.getChildren().get(0));
-                    AstNode newNode = new AstNode(toDoubleHelper(variables, node));
                     AstNode right = handleSimplifyHelper(variables, node.getChildren().get(1));
                     
-                    node.getChildren().set(0, left);
-                    node.getChildren().set(1, right);
+                    IList<AstNode> children = new DoubleLinkedList<AstNode>();
                     
-                    newNode.getChildren().add(left);
-                    newNode.getChildren().add(right);
+                    children.add(left);
+                    children.add(right);
+                    
+                    AstNode newNode = new AstNode(node.getName(), children);
+                    
+//                    newNode.getChildren().add(left);
+//                    newNode.getChildren().add(right);
                     
                     if (left.isNumber() && right.isNumber()) {
                         return new AstNode(toDoubleHelper(variables, newNode));
+                    } else {
+                        return newNode;
                     }
                 }
             }
